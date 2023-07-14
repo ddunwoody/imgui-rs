@@ -107,6 +107,13 @@ fn main() -> std::io::Result<()> {
             build.flag("-fno-exceptions").flag("-fno-rtti");
         }
 
+        // ddunwoody: patch added to allow static linking of gcc and stdc++ on windows using mingw32
+        if std::env::var_os("TARGET").expect("TARGET not set") == "x86_64-pc-windows-gnu" {
+            println!("cargo:rustc-link-search=/usr/lib/gcc/x86_64-w64-mingw32/10-win32");
+            println!("cargo:rustc-link-lib=static=gcc");
+            println!("cargo:rustc-link-lib=static=stdc++");
+        }
+
         // Build imgui lib, suppressing warnings.
         build.warnings(false).file(imgui_cpp).compile("libcimgui.a");
     }
